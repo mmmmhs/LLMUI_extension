@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 if (node_value.match(value)) {
                     re_2 = new RegExp('(<[^>]*>)'+ node_value +'(</[^>]*>)', 'g')
-                    new_value = node_value.replace(re, "<mark>"+value+"</mark>")
+                    new_value = node_value.replace(re, "<mark class='hlmask_"+ value.replace(/ /g, "_") + "'>" + value +"</mark>")
                     new_html = node_html.replace(node_value, new_value)
                     node.innerHTML = new_html;
                 }
@@ -101,23 +101,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-
     function find_title(value) {
         var all_html = document.documentElement.innerHTML;
         // match <a ... title="... value ...">...</a>
         // add <span style="background-color:yellow"> ... </span> to each match
-        var re = new RegExp('(<a[^>]*title="[^>]*' + escapeRegExp(value) + '[^>]*"[^>]*>)(.+?)(</a>)', 'g');
-        all_html = all_html.replace(re, "$1<div style='height:100%;width:100%;background:rgba(255,255,0,0.5);'>$2</div>$3");
+        var re = new RegExp('(<a[^>]*title="[^>]*' + escapeRegExp(value) + '[^>]*"[^>]*>)(.*?)(</a>)', 'g');
+        all_html = all_html.replace(re, "$1<div class='hlmask_"+ value.replace(/ /g, "_") + "' style='height:100%;width:100%;background:rgba(255,255,0,0.5);'>$2</div>$3");
         document.documentElement.innerHTML = all_html;
     }
 
     function remove_highlight(value) {
-        var all_html = document.documentElement.innerHTML;
-        // match <a ... title="... value ...">...</a>
-        // add <span style="background-color:yellow"> ... </span> to each match
-        var re = new RegExp('(<a[^>]*title="[^>]*' + escapeRegExp(value) + '[^>]*"[^>]*>)<div style="height:100%;width:100%;background:rgba(255,255,0,0.5);">(.+?)</div>(</a>)', 'g');
-        all_html = all_html.replace(re, "$1$2$3");
-        document.documentElement.innerHTML = all_html;
+        // find all elements with class hlmask
+        var all_elements = document.getElementsByClassName('hlmask_'+ value.replace(/ /g, "_"));
+        for (var i = 0; i < all_elements.length; i++) {
+            var element = all_elements[i];
+            children = element.childNodes;
+            parent = element.parentNode;
+            for (var j = 0; j < children.length; j++) {
+                parent.insertBefore(children[j], element);
+            }
+            parent.removeChild(element);
+        }
     }
 
     // input enter
