@@ -1,0 +1,11 @@
+{
+  "name": "LLMUI",
+  "version": "1",
+  "manifest_version": 3,
+  "description": "Locates elements on webpages according to users' description, based on LLM.",
+  "action": {
+    "default_popup": "extention.html"
+  },
+  "permissions": ["tabs", "activeTab", "scripting", "storage"]
+
+}

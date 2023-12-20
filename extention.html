@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Font Settings</title>
+    <script src="llmui.js" type="module"></script>
+  </head>
+  <style>
+    body {
+      font-family: sans-serif;
+      /* use picture in assets dir as background */
+      background-image: url("./assets/grey_bg.jpg");
+    }
+    h1 {
+      font-size: 1.2em;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5em;
+    }
+    text {
+        font-size: 1em;
+        color: aliceblue;
+        border: 1em;
+        margin: 1em;
+    }
+    button {
+      font-size: 1em;
+      color: aliceblue;
+      height: 2em;
+      width: 5em;
+      /* border-radius: 50%; */
+      margin: 1em;
+      border-width: 0;
+      background-color: #585857;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #050505;
+    }
+    button:active {
+      background-color: #070707;
+    }
+    input {
+      margin: 1em;
+    }
+    list {
+        display: flex;
+        writing-mode: vertical-lr;
+        float: left;
+    }
+    suggestion {
+        font-size: 1em;
+        background-color: #ffffff;
+        border: 0.07em solid #000000;
+        /* border-width: 0.1em solid #000000; */
+        margin: 1em;
+        width: auto;
+        vertical-align: middle;
+        display: inline-block;
+        padding: 0.5em;
+        cursor: pointer;
+    }
+    mark {
+        background-color: yellow;
+        color: black;
+    }
+  </style>
+
+  <body>
+    <div align="center">
+        <h1>LLMUI</h1>
+        <div>
+            <div class="text">Enter your question:</div>
+            <input type="text" id="input" />
+        </div>
+        
+        <div class="text">Suggestion:</div>
+
+        <div class="list" id="suggestion">
+            <suggestion id="s1"></suggestion> <br>
+            <suggestion id="s2"></suggestion>
+        </div>
+        <!-- <button type="button" id="query">query</button>
+        <button type="button" id="find">find</button> -->
+        <span class="label" id="output"></span>
+    </div>
+  </body>
+</html>
