@@ -1,13 +1,15 @@
-
-
 document.addEventListener('DOMContentLoaded', () => {
-    const querybtn = document.getElementById('query');
-    const findbtn = document.getElementById('find');
+    // const querybtn = document.getElementById('query');
+    // const findbtn = document.getElementById('find');
     const input = document.getElementById('input');
     const output = document.getElementById('output'); 
     const s1 = document.getElementById('s1');
     const s2 = document.getElementById('s2');
+    const kwtext = document.getElementById('kw');
     
+    kwtext.innerHTML = '';
+    highlight = '';
+
     // send request to local server
     function get_suggestion(url) {
         var xhr = new XMLHttpRequest();
@@ -15,8 +17,18 @@ document.addEventListener('DOMContentLoaded', () => {
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
-                    s1.innerHTML = xhr.responseText.split('\n')[0];
-                    s2.innerHTML = xhr.responseText.split('\n')[1];
+                    // set text of s1 and s2
+                    response = JSON.parse(xhr.responseText);
+                    s1.innerHTML = response["questions"].split('\n')[0];
+                    s2.innerHTML = response["questions"].split('\n')[1];
+                    s1.addEventListener('click', () => {
+                        input.value = s1.innerHTML;
+                        query(url);
+                    });
+                    s2.addEventListener('click', () => {
+                        input.value = s2.innerHTML;
+                        query(url);
+                    });
                 }
             }
         }
@@ -28,27 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
         get_suggestion(url);
     });
 
-    function query(url) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', 'http://localhost:8000/web_qa?question=' + input.value + "&url=" + url, true);
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
-                    output.innerHTML = xhr.response['answer'];
-                    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-                        chrome.scripting.executeScript({
-                            target : {tabId : tabs[0].id},
-                            func : find_title,
-                            args : [xhr.response['keywords']]
-                        });
-                    });   
-                }
-            }
-        }
-        xhr.send();
-    }
-
-// <span>value</span>
     function find(value) {
         var res = window.find(value, false, false, true);
         console.log(res);
@@ -59,8 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
         //$&表示整个被匹配的字符串
     }
 
-    // recursively find all text nodes
-    // match value and add <span>value</span> to each match
     function find_in_text_node(value) {
         // go through all nodes 
         var queue = [];
@@ -80,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         console.log(all_nodes.length)
-        // above is perfect
         for (var i = 0; i < all_nodes.length; i++) {
             node = all_nodes[i];
             node_html = node.innerHTML;
@@ -101,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    function find_title(value) {
+    function find_in_title(value) {
         var all_html = document.documentElement.innerHTML;
         // match <a ... title="... value ...">...</a>
         // add <span style="background-color:yellow"> ... </span> to each match
@@ -124,6 +112,54 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+
+    function query(url) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'http://localhost:8000/web_qa?question=' + input.value + "&url=" + url, true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                if (xhr.status == 200) {
+                    response = JSON.parse(xhr.responseText);
+                    output.innerHTML = response['answer'];
+                    for (var i = 0; i < response['basis'].length; i++)
+                    {
+                        kw = response['basis'][i];
+                        kwtext.innerHTML += "<li class='text' id='li_" + i + "'><a href=''>" + kw + "</a></li>";
+                        var li = document.getElementById('li_' + i);
+                        li.addEventListener('click', () => {
+                            // remove highlight
+                            if (highlight != '') {
+                                chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+                                    chrome.scripting.executeScript({
+                                        target : {tabId : tabs[0].id},
+                                        func : remove_highlight,
+                                        args : [highlight]
+                                    });
+                                });
+                            }
+                            chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+                                chrome.scripting.executeScript({
+                                    target : {tabId : tabs[0].id},
+                                    func : find_in_title,
+                                    args : [kw]
+                                });
+                            });
+                            chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+                                chrome.scripting.executeScript({
+                                    target : {tabId : tabs[0].id},
+                                    func : find_in_text_node,
+                                    args : [kw]
+                                });
+                            });
+                            highlight = kw;
+                        });
+                    }
+                }
+            }
+        }
+        xhr.send();
+    }
+
     // input enter
     input.addEventListener('keyup', (event) => {
         if (event.key == 'Enter') {
@@ -133,14 +169,4 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
-
-    // findbtn.addEventListener('click', () => {
-    //     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-    //         chrome.scripting.executeScript({
-    //             target : {tabId : tabs[0].id},
-    //             func : find,
-    //             args : [input.value]
-    //         });
-    //     });   
-    // });
 });
