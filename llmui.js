@@ -8,11 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const kwtext = document.getElementById('kw');
     
     kwtext.innerHTML = '';
-    highlight = '';
+    var highlight = '';
 
     // send request to local server
     function get_suggestion(url) {
         var xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
         xhr.open('GET', 'http://localhost:8000/suggestion?url=' + url, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
@@ -35,8 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
         xhr.send();
     }
 
-    chrome.tabs.getSelected(null, function(tab) {
-        var url = tab.url;
+    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+        var url = tabs[0].url;
         get_suggestion(url);
     });
 
@@ -115,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function query(url) {
         var xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
         xhr.open('GET', 'http://localhost:8000/web_qa?question=' + input.value + "&url=" + url, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
@@ -163,8 +165,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // input enter
     input.addEventListener('keyup', (event) => {
         if (event.key == 'Enter') {
-            chrome.tabs.getSelected(null, function(tab) {
-                var url = tab.url;
+            chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+                var url = tabs[0].url;
                 query(url);
             });
         }
