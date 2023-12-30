@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const s1 = document.getElementById('s1');
     const s2 = document.getElementById('s2');
     const kwtext = document.getElementById('kw');
+    const host = 'http://localhost:8000';
     
     kwtext.innerHTML = '';
     var highlight = '';
@@ -15,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function get_suggestion(url) {
         var xhr = new XMLHttpRequest();
         // xhr.withCredentials = true;
-        xhr.open('GET', 'http://localhost:8000/suggestion?url=' + url, true);
+        xhr.open('GET', host+'/suggestion?url=' + url, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
@@ -121,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function query(url) {
         var xhr = new XMLHttpRequest();
         // xhr.withCredentials = true;
-        xhr.open('GET', 'http://localhost:8000/web_qa?question=' + input.value + "&url=" + url, true);
+        xhr.open('GET', host+'/web_qa?question=' + input.value + "&url=" + url, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
@@ -166,6 +167,30 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         xhr.send();
+    }
+
+    function upload_html() {
+        // 获取当前页面的 HTML
+        var htmlContent = document.documentElement.outerHTML;
+
+        // 创建一个要发送的对象
+        var data = { html: htmlContent };
+
+        // 使用 fetch 发送 POST 请求
+        fetch(host+'/upload?url=' + url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
     }
 
     // input enter
