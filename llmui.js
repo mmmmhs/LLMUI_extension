@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // const querybtn = document.getElementById('query');
     // const findbtn = document.getElementById('find');
     const input = document.getElementById('input');
+    const answer_title = document.getElementById('answer');
     const output = document.getElementById('output'); 
     const s1 = document.getElementById('s1');
     const s2 = document.getElementById('s2');
@@ -13,15 +14,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // send request to local server
     function get_suggestion(url) {
         var xhr = new XMLHttpRequest();
-        xhr.withCredentials = true;
+        // xhr.withCredentials = true;
         xhr.open('GET', 'http://localhost:8000/suggestion?url=' + url, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
                     // set text of s1 and s2
-                    response = JSON.parse(xhr.responseText);
-                    s1.innerHTML = response["questions"].split('\n')[0];
-                    s2.innerHTML = response["questions"].split('\n')[1];
+                    console.log(xhr.responseText)
+                    var response = JSON.parse(xhr.responseText);
+                    console.log(response)
+                    console.log(typeof(response["questions"]))
+                    s1.innerHTML = response["questions"][0];
+                    s2.innerHTML = response["questions"][1];
                     s1.addEventListener('click', () => {
                         input.value = s1.innerHTML;
                         query(url);
@@ -116,16 +120,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function query(url) {
         var xhr = new XMLHttpRequest();
-        xhr.withCredentials = true;
+        // xhr.withCredentials = true;
         xhr.open('GET', 'http://localhost:8000/web_qa?question=' + input.value + "&url=" + url, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
-                    response = JSON.parse(xhr.responseText);
+                    var response = JSON.parse(xhr.responseText);
+                    answer_title.innerHTML = "Answer: "
                     output.innerHTML = response['answer'];
                     for (var i = 0; i < response['basis'].length; i++)
                     {
-                        kw = response['basis'][i];
+                        var kw = response['basis'][i];
                         kwtext.innerHTML += "<li class='text' id='li_" + i + "'><a href=''>" + kw + "</a></li>";
                         var li = document.getElementById('li_' + i);
                         li.addEventListener('click', () => {

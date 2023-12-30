@@ -1,7 +1,7 @@
 ## Overview
 
 The extension can assist users to get acquainted with interface of webpages under guidance offered by LLM.
-
+The backend server is deployed by https://github.com/chuanmx20/web-crawl-qa.
 ## Running this extension
 
 1. Clone this repository.
