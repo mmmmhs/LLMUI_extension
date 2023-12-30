@@ -131,10 +131,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     for (var i = 0; i < response['basis'].length; i++)
                     {
                         var kw = response['basis'][i];
-                        kwtext.innerHTML += "<li class='text' id='li_" + i + "'><a href=''>" + kw + "</a></li>";
+                        kwtext.innerHTML += "<li class='text' id='li_" + i + "'><a class='clickable-text'>" + kw + "</a></li>";
                         var li = document.getElementById('li_' + i);
                         li.addEventListener('click', () => {
                             // remove highlight
+                            console.log(li.id, li.innerHTML);
                             if (highlight != '') {
                                 chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
                                     chrome.scripting.executeScript({
