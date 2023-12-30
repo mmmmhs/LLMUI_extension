@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
         var url = tabs[0].url;
+        upload_html();
         get_suggestion(url);
     });
 
