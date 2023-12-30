@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
         var data = { html: htmlContent };
 
         // 使用 fetch 发送 POST 请求
-        fetch(host+'/upload', {
+        fetch(host+'/upload?url=' + url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
