@@ -156,6 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     var response = JSON.parse(xhr.responseText);
                     answer_title.innerHTML = "Answer: "
                     output.innerHTML = response['answer'];
+                    kwtext.innerHTML = ""
                     for (var i = 0; i < response['basis'].length; i++)
                     {
                         var kw = response['basis'][i];
