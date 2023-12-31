@@ -44,22 +44,21 @@ document.addEventListener('DOMContentLoaded', () => {
     function upload_html(url) {
         // 获取当前页面的 HTML
         var htmlContent = document.documentElement.outerHTML;
+        var formData = new FormData();
         const host = 'http://localhost:8000';
-        // 创建一个要发送的对象
-        var data = { html: htmlContent };
-        console.log(htmlContent)
-        // 使用 fetch 发送 POST 请求
-        fetch(host+'/upload?url=' + url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-            body: JSON.stringify(data),
-            mode: 'no-cors'
-        }).then(console.log)
-        .catch(error => {
-            console.log(error)
-        });
+        formData.append('html', htmlContent);
+        formData.append('url', url);
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', host + '/upload?url' + url, true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                if (xhr.status == 200) {
+                    console.log(xhr.responseText);
+                    get_suggestion(url);
+                }
+            }
+        }
+        xhr.send(formData);
     }
 
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
