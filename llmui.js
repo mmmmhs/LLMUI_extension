@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function get_suggestion(url) {
         var xhr = new XMLHttpRequest();
         // xhr.withCredentials = true;
-        xhr.open('GET', host+'/suggestion?url=' + url, true);
+        xhr.open('GET', host+'/assistant_suggestion?url=' + url, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
@@ -41,21 +41,50 @@ document.addEventListener('DOMContentLoaded', () => {
         xhr.send();
     }
 
+    function upload_html(url) {
+        // 获取当前页面的 HTML
+        var htmlContent = document.documentElement.outerHTML;
+        const host = 'http://localhost:8000';
+        // 创建一个要发送的对象
+        var data = { html: htmlContent };
+        console.log(htmlContent)
+        // 使用 fetch 发送 POST 请求
+        fetch(host+'/upload?url=' + url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+            mode: 'no-cors'
+        }).then(console.log)
+        .catch(error => {
+            console.log(error)
+        });
+    }
+
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
         var url = tabs[0].url;
-        upload_html();
-        get_suggestion(url);
+        chrome.scripting.executeScript({
+            target : {tabId : tabs[0].id},
+            func : upload_html,
+            args : [url]
+        }).then(() => {upload_html(url);});
     });
+
+    // chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+    //     var url = tabs[0].url;
+    //     get_suggestion(url);
+    // });
 
     function find(value) {
         var res = window.find(value, false, false, true);
         console.log(res);
     }
 
-    function escapeRegExp(string) {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        //$&表示整个被匹配的字符串
-    }
+    // function escapeRegExp(string) {
+    //     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    //     //$&表示整个被匹配的字符串
+    // }
 
     function find_in_text_node(value) {
         // go through all nodes 
@@ -80,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
             node = all_nodes[i];
             node_html = node.innerHTML;
             // text node
-            var re = new RegExp(escapeRegExp(value), 'g');
+            var re = new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), 'g');
             node_value = node.childNodes[0].nodeValue;
             try {
                 if (node_value.match(value)) {
@@ -100,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
         var all_html = document.documentElement.innerHTML;
         // match <a ... title="... value ...">...</a>
         // add <span style="background-color:yellow"> ... </span> to each match
-        var re = new RegExp('(<a[^>]*title="[^>]*' + escapeRegExp(value) + '[^>]*"[^>]*>)(.*?)(</a>)', 'g');
+        var re = new RegExp('(<a[^>]*title="[^>]*' + value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '[^>]*"[^>]*>)(.*?)(</a>)', 'g');
         all_html = all_html.replace(re, "$1<div class='hlmask_"+ value.replace(/ /g, "_") + "' style='height:100%;width:100%;background:rgba(255,255,0,0.5);'>$2</div>$3");
         document.documentElement.innerHTML = all_html;
     }
@@ -123,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function query(url) {
         var xhr = new XMLHttpRequest();
         // xhr.withCredentials = true;
-        xhr.open('GET', host+'/web_qa?question=' + input.value + "&url=" + url, true);
+        xhr.open('GET', host+'/assistant_qa?question=' + input.value + "&url=" + url, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
@@ -133,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     for (var i = 0; i < response['basis'].length; i++)
                     {
                         var kw = response['basis'][i];
-                        kwtext.innerHTML += "<li class='text' id='li_" + i + "'><a class='clickable-text'>" + kw + "</a></li>";
+                        kwtext.innerHTML += "<li class='text' id='li_" + i + "'><a href='javascript:void(0);'>" + kw + "</a></li>";
                         var li = document.getElementById('li_' + i);
                         li.addEventListener('click', () => {
                             // remove highlight
@@ -168,30 +197,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         xhr.send();
-    }
-
-    function upload_html() {
-        // 获取当前页面的 HTML
-        var htmlContent = document.documentElement.outerHTML;
-
-        // 创建一个要发送的对象
-        var data = { html: htmlContent };
-
-        // 使用 fetch 发送 POST 请求
-        fetch(host+'/upload?url=' + url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
     }
 
     // input enter

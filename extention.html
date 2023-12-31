@@ -64,12 +64,12 @@
         background-color: yellow;
         color: black;
     }
-    clickable-text {
-        /* cursor: pointer; */
+    /* clickable-text {
+        cursor: pointer;
         color: rgb(77, 224, 8);
         background-color: aqua;
-        /* text-underline-position: below; */
-    }
+        text-underline-position: below;
+    } */
   </style>
 
   <body>
@@ -87,13 +87,12 @@
             <suggestion id="s2">Loading...</suggestion>
         </div>
         <ul id="kw" style="text-align:center;align-items:center;justify-content:center;margin:0; padding:0; list-style:none;">
-            <li class="text" id="li_" + ><a class='clickable-text'></a></li>
+            <li class="text" id="li_" + ><a href="javascript:void(0);"></a></li>
         </ul>
         <!-- <button type="button" id="query">query</button>
         <button type="button" id="find">find</button> -->
         <div id="answer" style="font-size: 1.1em;"></div>
         <span class="label" id="output"></span>
-        <div class="clickable-text" style="color: aquamarine;">aaaaaa</div>
     </div>
   </body>
 </html>
