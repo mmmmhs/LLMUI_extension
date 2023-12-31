@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
             target : {tabId : tabs[0].id},
             func : upload_html,
             args : [url]
-        }).then(() => {upload_html(url);});
+        }).then(() => {get_suggestion(url);});
     });
 
     // chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
