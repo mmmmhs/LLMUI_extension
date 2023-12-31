@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fetch(host+'/upload?url=' + url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'multipart/form-data',
             },
             body: JSON.stringify(data),
             mode: 'no-cors'
