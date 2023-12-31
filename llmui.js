@@ -47,9 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
         var formData = new FormData();
         const host = 'http://localhost:8000';
         formData.append('html', htmlContent);
-        formData.append('url', url);
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', host + '/upload?url' + url, true);
+        xhr.open('POST', host + '/upload?url=' + url, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
