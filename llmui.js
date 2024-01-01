@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for (var i = 0; i < keywords.length; i++)
             {
                 var kw = keywords[i];
-                kwtext.innerHTML += "<li class='fw-medium btn btn-light shadow-sm my-1 border' role='button' id='li_" + i + "'><a>" + kw + "</a></li>";
+                kwtext.innerHTML += "<li class='fw-medium btn btn-light shadow-sm m-1 border' role='button' id='li_" + i + "'><a>" + kw + "</a></li>";
                 // TODO
                 var li = document.getElementById('li_' + i);
                 li.addEventListener('click', () => {
@@ -159,12 +159,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // 获取之前保存的 URL
         chrome.storage.local.get(['savedUrl'], function(result) {
             if (result.savedUrl !== url) {
-                // 如果 URL 不同，清空 'input_question' 和 'output'
-                chrome.storage.local.set({ 'input_question': '', 'output': '', 's1':'Loading...', 's2':'Loading'});
+                // 如果 URL 不同，清空 'input_question' 和 'output' 和 'keywords'
+                chrome.storage.local.set({ 'input_question': '', 'output': '', 's1':'Loading...', 's2':'Loading', 'keywords': '' });
                 s1.innerHTML = 'Loading...';
                 s2.innerHTML = 'Loading...';
                 input_question.innerHTML = '';
                 output.innerHTML = '';
+                kwtext.innerHTML = '';
+                highlight_title.className = 'invisible'; // hide highlight title
 
                 // 可选：更新保存的 URL
                 chrome.storage.local.set({ 'savedUrl': url });
@@ -324,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     for (var i = 0; i < response['basis'].length; i++)
                     {
                         var kw = response['basis'][i];
-                        kwtext.innerHTML += "<li class='fw-medium btn btn-light shadow-sm my-1 border' role='button' id='li_" + i + "'><a>" + kw + "</a></li>";
+                        kwtext.innerHTML += "<li class='fw-medium btn btn-light shadow-sm m-1 border' role='button' id='li_" + i + "'><a>" + kw + "</a></li>";
                         var li = document.getElementById('li_' + i);
                         li.addEventListener('click', () => {
                             // remove highlight
