@@ -133,10 +133,54 @@ document.addEventListener('DOMContentLoaded', () => {
             node_value = node.childNodes[0].nodeValue;
             try {
                 if (node_value.match(value)) {
-                    re_2 = new RegExp('(<[^>]*>)'+ node_value +'(</[^>]*>)', 'g')
-                    new_value = node_value.replace(re, "<mark class='hlmask_"+ value.replace(/ /g, "_") + "'>" + value +"</mark>")
-                    new_html = node_html.replace(node_value, new_value)
-                    node.innerHTML = new_html;
+                    // re_2 = new RegExp('(<[^>]*>)'+ node_value +'(</[^>]*>)', 'g')
+                    // new_value = node_value.replace(re, "<mark class='hlmask_"+ value.replace(/ /g, "_") + "'>" + value +"</mark>")
+                    // new_html = node_html.replace(node_value, new_value)
+                    // node.innerHTML = new_html;
+                    node.style.backgroundColor = "yellow";
+                }
+            } catch (e) {
+                console.log(e);
+                console.log(node_value)
+            }
+        }
+    }
+
+    function find_in_title_node(value) {
+        // go through all nodes 
+        var queue = [];
+        var all_nodes = [];
+        var node = document.documentElement;
+        queue.push(node);
+        while (queue.length > 0) {
+            // console.log(queue.length)
+            node = queue.shift();
+            if (node.childNodes.length > 0) {
+                node.childNodes.forEach((child) => {
+                    queue.push(child);
+                });
+                // if (node.childNodes.length == 1 && node.nodeType == 1 && node.childNodes[0].nodeType == 3) {
+                all_nodes.push(node);
+                // }
+            }
+        }
+        console.log(all_nodes.length)
+        for (var i = 0; i < all_nodes.length; i++) {
+            node = all_nodes[i];
+            node_html = node.innerHTML;
+            // text node
+            var re = new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), 'g');
+            node_value = node.childNodes[0].nodeValue;
+            outer_html = node.outerHTML
+            var re = new RegExp('^<a[^>]*title="[^>]*' + value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '[^>]*"[^>]*>.*?</a>$', 'g');
+            try {
+                if (outer_html.match(re)) {
+                    // re_2 = new RegExp('(<[^>]*>)'+ node_value +'(</[^>]*>)', 'g')
+                    // new_value = node_value.replace(re, "<mark class='hlmask_"+ value.replace(/ /g, "_") + "'>" + value +"</mark>")
+                    // new_html = node_html.replace(node_value, new_value)
+                    // node.innerHTML = new_html;
+                    console.log(node)
+                    node.childNodes[0].style.backgroundColor = "yellow";
                 }
             } catch (e) {
                 console.log(e);
@@ -190,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    function resetHighlight() {
+    function reset_highlight() {
         const allElements = document.querySelectorAll("body *");
     
         allElements.forEach((element) => {
@@ -199,12 +243,61 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    function kw_click(kw) {
+        if (highlight != '') {
+            chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+                chrome.scripting.executeScript({
+                    target : {tabId : tabs[0].id},
+                    func : reset_highlight,
+                });
+            });
+        }
+        chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+            chrome.scripting.executeScript({
+                target : {tabId : tabs[0].id},
+                func : find_in_text_node,
+                args : [kw]
+            });
+        });
+        chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+            chrome.scripting.executeScript({
+                target : {tabId : tabs[0].id},
+                func: find_in_title_node,
+                args : [kw]
+            });
+        });
+        highlight = kw;
+    }
 
+    function query_mock(url) {
+        var li = Array();
+        var response = {}
+        response['basis'] = ["文件", "保存", "缩小"]
+        for (var i = 0; i < 3; i++)
+        {
+            var kw = response['basis'][i];
+            kwtext.innerHTML += "<li class='text' id='li_" + i + "' style='margin-left: 1em;'>" + kw + "</li>";
+            var new_li = document.getElementById('li_' + i);
+            li.push(new_li)
+        }
+        document.getElementById('li_0').addEventListener('click', () => {
+            kw_click(li[0].innerHTML)
+        });
+        document.getElementById('li_1').addEventListener('click', () => {
+            kw_click(li[1].innerHTML)
+        });
+        document.getElementById('li_2').addEventListener('click', () => {
+            kw_click(li[2].innerHTML)
+        });
+    }
+    
     function query(url) {
+        var li = Array();
         var xhr = new XMLHttpRequest();
         xhr.open('GET', host+'/assistant_qa?question=' + input.value + "&url=" + url, true);
         var loadingIndicator = document.getElementById('loadingIndicator');
         loadingIndicator.style.display = 'block';
+        kwtext.innerHTML = ""
 
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
@@ -212,47 +305,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (xhr.status == 200) {
                     var response = JSON.parse(xhr.responseText);
                     output.innerHTML = response['answer'];
-
+                    console.log(response['basis'])
                     // set output in local storage
                     chrome.storage.local.set({'output': response['answer']}, function() {
                         console.log('output in localstorage is set to ' + response['answer']);
                     });
-
-                    kwtext.innerHTML = ""
-                    for (var i = 0; i < response['basis'].length; i++)
+                    for (var i = 0; i < 3; i++)
                     {
                         var kw = response['basis'][i];
-                        kwtext.innerHTML += "<li class='text' id='li_" + i + "' style='margin: 1em;'><a>" + kw + "</a></li>";
-                        var li = document.getElementById('li_' + i);
-                        li.addEventListener('click', () => {
-                            // remove highlight
-                            console.log(li.id, li.innerHTML);
-                            if (highlight != '') {
-                                chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-                                    chrome.scripting.executeScript({
-                                        target : {tabId : tabs[0].id},
-                                        func : remove_highlight,
-                                        args : [highlight]
-                                    });
-                                });
-                            }
-                            chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-                                chrome.scripting.executeScript({
-                                    target : {tabId : tabs[0].id},
-                                    func : find_in_text_node,
-                                    args : [kw]
-                                });
-                            });
-                            chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-                                chrome.scripting.executeScript({
-                                    target : {tabId : tabs[0].id},
-                                    func : find_in_title,
-                                    args : [kw]
-                                });
-                            });
-                            highlight = kw;
-                        });
+                        kwtext.innerHTML += "<li class='text' id='li_" + i + "' style='margin-left: 1em;'>" + kw + "</li>";
+                        var new_li = document.getElementById('li_' + i);
+                        li.push(new_li)
                     }
+                    document.getElementById('li_0').addEventListener('click', () => {
+                        kw_click(li[0].innerHTML)
+                    });
+                    document.getElementById('li_1').addEventListener('click', () => {
+                        kw_click(li[1].innerHTML)
+                    });
+                    document.getElementById('li_2').addEventListener('click', () => {
+                        kw_click(li[2].innerHTML)
+                    });
                 }
             }
         }
@@ -272,6 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 console.log(`query with url ${url} and input value ${input.value}`)
                 query(url);
+                // query_mock(url);
                 input_question.innerHTML = input.value;
                 // store input_question in local storage
                 chrome.storage.local.set({'input_question': input.value}, function() {
@@ -293,6 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 func : resetHighlight,
             });
             query(url);
+            // query_mock(url);
             input_question.innerHTML = input.value;
             // store input_question in local storage
             chrome.storage.local.set({'input_question': input.value}, function() {
