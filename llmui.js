@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const kwtext = document.getElementById('kw');
     const host = 'http://localhost:8000';
     const ask_button = document.getElementById('ask_button');
+    const input_question = document.getElementById('input_question');
     
     kwtext.innerHTML = '';
     var highlight = '';
@@ -213,6 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
             chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
                 var url = tabs[0].url;
                 query(url);
+                input_question.innerHTML = input.value;
                 input.value = '';
             });
         }
@@ -223,6 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
             var url = tabs[0].url;
             query(url);
+            input_question.innerHTML = input.value;
             input.value = '';
         });
     });
