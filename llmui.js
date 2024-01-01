@@ -29,11 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     s2.innerHTML = response["questions"][1];
                     s1.addEventListener('click', () => {
                         input.value = s1.innerHTML;
-                        query(url);
                     });
                     s2.addEventListener('click', () => {
                         input.value = s2.innerHTML;
-                        query(url);
                     });
                 }
             }
