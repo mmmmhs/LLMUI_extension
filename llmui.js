@@ -6,12 +6,58 @@ document.addEventListener('DOMContentLoaded', () => {
     const s1 = document.getElementById('s1');
     const s2 = document.getElementById('s2');
     const kwtext = document.getElementById('kw');
-    const host = 'http://localhost:8080';
+    const host = 'http://localhost:8000';
     // const host = 'http://localhost:8080';
     const ask_button = document.getElementById('ask_button');
     const input_question = document.getElementById('input_question');
+    const highlight_title = document.getElementById('highlight_title');
     
-    kwtext.innerHTML = '';
+    // read from local storage
+    chrome.storage.local.get(['keywords'], function(result) {
+        if (result.keywords != undefined) {
+            console.log('keywords in local storage currently is ' + result.keywords);
+
+            highlight_title.className = 'visible';
+
+            var keywords = result.keywords;
+            for (var i = 0; i < keywords.length; i++)
+            {
+                var kw = keywords[i];
+                kwtext.innerHTML += "<li class='fw-medium btn btn-light shadow-sm my-1 border' role='button' id='li_" + i + "'><a>" + kw + "</a></li>";
+                // TODO
+                var li = document.getElementById('li_' + i);
+                li.addEventListener('click', () => {
+                    // remove highlight
+                    console.log(li.id, li.innerHTML);
+                    if (highlight != '') {
+                        chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+                            chrome.scripting.executeScript({
+                                target : {tabId : tabs[0].id},
+                                func : remove_highlight,
+                                args : [highlight]
+                            });
+                        });
+                    }
+                    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+                        chrome.scripting.executeScript({
+                            target : {tabId : tabs[0].id},
+                            func : find_in_text_node,
+                            args : [kw]
+                        });
+                    });
+                    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+                        chrome.scripting.executeScript({
+                            target : {tabId : tabs[0].id},
+                            func : find_in_title,
+                            args : [kw]
+                        });
+                    });
+                    highlight = kw;
+                });
+            }
+        }
+    });
+
     var highlight = '';
     
     // check if input_question is stored in local storage
@@ -61,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function upload_html(url) {
         var htmlContent = document.documentElement.outerHTML;
         var formData = new FormData();
-        const host = 'http://localhost:8080';
+        const host = 'http://localhost:8000';
         formData.append('html', htmlContent);
         var xhr = new XMLHttpRequest();
         xhr.open('POST', host + '/upload?url=' + url, true);
@@ -218,11 +264,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.log('output in localstorage is set to ' + response['answer']);
                     });
 
+                    // store keywords in local storage
+                    chrome.storage.local.set({'keywords': response['basis']}, function() {
+                        console.log('keywords in localstorage is set to ' + response['basis']);
+                    });
+
                     kwtext.innerHTML = ""
                     for (var i = 0; i < response['basis'].length; i++)
                     {
                         var kw = response['basis'][i];
-                        kwtext.innerHTML += "<li class='text' id='li_" + i + "' style='margin: 1em;'><a>" + kw + "</a></li>";
+                        kwtext.innerHTML += "<li class='fw-medium btn btn-light shadow-sm my-1 border' role='button' id='li_" + i + "'><a>" + kw + "</a></li>";
                         var li = document.getElementById('li_' + i);
                         li.addEventListener('click', () => {
                             // remove highlight
