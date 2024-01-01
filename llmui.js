@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const s2 = document.getElementById('s2');
     const kwtext = document.getElementById('kw');
     const host = 'http://localhost:8000';
-    // const host = 'http://localhost:8080';
+    // const host = 'http://localhost:8000';
     const ask_button = document.getElementById('ask_button');
     const input_question = document.getElementById('input_question');
     const highlight_title = document.getElementById('highlight_title');
@@ -445,7 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 var url = tabs[0].url;
                 chrome.scripting.executeScript({
                     target : {tabId : tabs[0].id},
-                    func : resetHighlight,
+                    func : reset_highlight,
                 });
                 console.log(`query with url ${url} and input value ${input.value}`)
                 query(url);
@@ -468,7 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
             var url = tabs[0].url;
             chrome.scripting.executeScript({
                 target : {tabId : tabs[0].id},
-                func : resetHighlight,
+                func : reset_highlight,
             });
             query(url);
             // query_mock(url);
