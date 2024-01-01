@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const output = document.getElementById('output'); 
     const s1 = document.getElementById('s1');
     const s2 = document.getElementById('s2');
+    const s1_button = document.getElementById('s1_button');
+    const s2_button = document.getElementById('s2_button');
     const kwtext = document.getElementById('kw');
     const host = 'http://localhost:8000';
     // const host = 'http://localhost:8000';
@@ -65,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (result.s1 != undefined && result.s1 != 'Loading...') {
             console.log('suggested question one in local storage currently is ' + result.s1);
             s1.innerHTML = result.s1;
-            s1.addEventListener('click', () => {
+            s1_button.addEventListener('click', () => {
                 input.value = s1.innerHTML;
             });
         }
@@ -75,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (result.s2 != undefined && result.s2 != 'Loading...') {
             console.log('suggested question one in local storage currently is ' + result.s2);
             s2.innerHTML = result.s2;
-            s2.addEventListener('click', () => {
+            s2_button.addEventListener('click', () => {
                 input.value = s2.innerHTML;
             });
         }
@@ -121,10 +123,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.log('suggested question two in localstorage is set to ' + response['questions'][1]);
                     });
 
-                    s1.addEventListener('click', () => {
+                    s1_button.addEventListener('click', () => {
                         input.value = s1.innerHTML;
                     });
-                    s2.addEventListener('click', () => {
+                    s2_button.addEventListener('click', () => {
                         input.value = s2.innerHTML;
                     });
                 }
