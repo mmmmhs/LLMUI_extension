@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const s1 = document.getElementById('s1');
     const s2 = document.getElementById('s2');
     const kwtext = document.getElementById('kw');
-    const host = 'http://localhost:8080';
+    const host = 'http://localhost:8000';
     
     kwtext.innerHTML = '';
     var highlight = '';
@@ -42,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function upload_html(url) {
-        // return new Promise((resolve, reject) => {
         var htmlContent = document.documentElement.outerHTML;
         var formData = new FormData();
         const host = 'http://localhost:8080';
@@ -60,7 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         xhr.send(formData);
-        // });
     }
 
     chrome.tabs.query({active: true, currentWindow: true}).then((tabs) => {
