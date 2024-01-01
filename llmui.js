@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const s2 = document.getElementById('s2');
     const kwtext = document.getElementById('kw');
     const host = 'http://localhost:8000';
+    const ask_button = document.getElementById('ask_button');
     
     kwtext.innerHTML = '';
     var highlight = '';
@@ -28,11 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     s2.innerHTML = response["questions"][1];
                     s1.addEventListener('click', () => {
                         input.value = s1.innerHTML;
-                        query(url);
                     });
                     s2.addEventListener('click', () => {
                         input.value = s2.innerHTML;
-                        query(url);
                     });
                 }
             }
@@ -205,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         xhr.send();
-        console.log("query");
+        console.log(`query with url ${url} and input value ${input.value}`)
     }
 
     // input enter
@@ -213,9 +212,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event.key == 'Enter') {
             chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
                 var url = tabs[0].url;
-                console.log(`query with url ${url} and input value ${input.value}`)
                 query(url);
+                input.value = '';
             });
         }
+    });
+
+    // when ask_button is clicked
+    ask_button.addEventListener('click', () => {
+        chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+            var url = tabs[0].url;
+            query(url);
+            input.value = '';
+        });
     });
 });
