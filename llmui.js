@@ -1,6 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // const querybtn = document.getElementById('query');
-    // const findbtn = document.getElementById('find');
     const input = document.getElementById('input');
     const output = document.getElementById('output'); 
     const s1 = document.getElementById('s1');
@@ -8,57 +6,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const s1_button = document.getElementById('s1_button');
     const s2_button = document.getElementById('s2_button');
     const kwtext = document.getElementById('kw');
-    const host = 'http://localhost:8000';
-    // const host = 'http://localhost:8000';
+    const host = 'http://localhost:8080';
+    // const host = 'http://localhost:8080';
     const ask_button = document.getElementById('ask_button');
     const input_question = document.getElementById('input_question');
     const highlight_title = document.getElementById('highlight_title');
     
     // read from local storage
-    chrome.storage.local.get(['keywords'], function(result) {
-        if (result.keywords != undefined) {
-            console.log('keywords in local storage currently is ' + result.keywords);
-
-            highlight_title.className = 'visible';
-
-            var keywords = result.keywords;
-            for (var i = 0; i < keywords.length; i++)
-            {
-                var kw = keywords[i];
-                kwtext.innerHTML += "<li class='fw-medium btn btn-light shadow-sm m-1 border' role='button' id='li_" + i + "'><a>" + kw + "</a></li>";
-                // TODO
-                var li = document.getElementById('li_' + i);
-                li.addEventListener('click', () => {
-                    // remove highlight
-                    console.log(li.id, li.innerHTML);
-                    if (highlight != '') {
-                        chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-                            chrome.scripting.executeScript({
-                                target : {tabId : tabs[0].id},
-                                func : remove_highlight,
-                                args : [highlight]
-                            });
-                        });
-                    }
-                    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-                        chrome.scripting.executeScript({
-                            target : {tabId : tabs[0].id},
-                            func : find_in_text_node,
-                            args : [kw]
-                        });
-                    });
-                    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-                        chrome.scripting.executeScript({
-                            target : {tabId : tabs[0].id},
-                            func : find_in_title,
-                            args : [kw]
-                        });
-                    });
-                    highlight = kw;
-                });
-            }
-        }
-    });
 
     var highlight = '';
     
@@ -88,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (result.input_question != undefined) {
             console.log('input_question in local storage currently is ' + result.input_question);
             input_question.innerHTML = result.input_question;
+
         }
     });
 
@@ -139,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function upload_html(url) {
         var htmlContent = document.documentElement.outerHTML;
         var formData = new FormData();
-        const host = 'http://localhost:8000';
+        const host = 'http://localhost:8080';
         formData.append('html', htmlContent);
         var xhr = new XMLHttpRequest();
         xhr.open('POST', host + '/upload?url=' + url, true);
@@ -162,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chrome.storage.local.get(['savedUrl'], function(result) {
             if (result.savedUrl !== url) {
                 // 如果 URL 不同，清空 'input_question' 和 'output' 和 'keywords'
-                chrome.storage.local.set({ 'input_question': '', 'output': '', 's1':'Loading...', 's2':'Loading', 'keywords': '' });
+                chrome.storage.local.set({ 'input_question': '', 'output': '', 's1':'Loading...', 's2':'Loading...', 'keywords': '' });
                 s1.innerHTML = 'Loading...';
                 s2.innerHTML = 'Loading...';
                 input_question.innerHTML = '';
@@ -260,9 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 node.childNodes.forEach((child) => {
                     queue.push(child);
                 });
-                // if (node.childNodes.length == 1 && node.nodeType == 1 && node.childNodes[0].nodeType == 3) {
                 all_nodes.push(node);
-                // }
             }
         }
         console.log(all_nodes.length)
@@ -481,5 +434,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 input.value = '';
             });
         });
+    });
+
+    chrome.storage.local.get(['keywords'], function(result) {
+        if (result.keywords != undefined) {
+            console.log('keywords in local storage currently is ' + result.keywords);
+
+            highlight_title.className = 'visible';
+
+            var keywords = result.keywords;
+            for (var i = 0; i < 3; i++){
+                kwtext.innerHTML += "<li class='fw-medium btn btn-light shadow-sm m-1 border' role='button' id='li_" + i + "'><a>" + keywords[i] + "</a></li>";
+            }
+            document.getElementById('li_0').addEventListener('click', () => {
+                kw_click(keywords[0])
+            });
+            document.getElementById('li_1').addEventListener('click', () => {
+                kw_click(keywords[1])
+            });
+            document.getElementById('li_2').addEventListener('click', () => {
+                kw_click(keywords[2])
+            });
+        }
     });
 });
