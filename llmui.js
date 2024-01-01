@@ -7,77 +7,75 @@ document.addEventListener('DOMContentLoaded', () => {
     const s1 = document.getElementById('s1');
     const s2 = document.getElementById('s2');
     const kwtext = document.getElementById('kw');
-    const host = 'http://localhost:8000';
+    const host = 'http://localhost:8080';
     
     kwtext.innerHTML = '';
     var highlight = '';
-// send request to local server
-function get_suggestion(url) {
-    var xhr = new XMLHttpRequest();
-    // xhr.withCredentials = true;
-    xhr.open('GET', host+'/assistant_suggestion?url=' + url, true);
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4) {
-            if (xhr.status == 200) {
-                // set text of s1 and s2
-                console.log(xhr.responseText);
-                var response = JSON.parse(xhr.responseText);
-                console.log(response);
-                console.log(typeof(response["questions"]));
-                s1.innerHTML = response["questions"][0];
-                s2.innerHTML = response["questions"][1];
-                s1.addEventListener('click', () => {
-                    input.value = s1.innerHTML;
-                    query(url);
-                });
-                s2.addEventListener('click', () => {
-                    input.value = s2.innerHTML;
-                    query(url);
-                });
-            }
-        }
-    }
-    xhr.send();
-}
-
-function upload_html(url) {
-    return new Promise((resolve, reject) => {
-        var htmlContent = document.documentElement.outerHTML;
-        var formData = new FormData();
-        const host = 'http://localhost:8000';
-        formData.append('html', htmlContent);
+    // send request to local server
+    function get_suggestion(url) {
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', host + '/upload?url=' + url, true);
+        // xhr.withCredentials = true;
+        xhr.open('GET', host+'/assistant_suggestion?url=' + url, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
+                    // set text of s1 and s2
                     console.log(xhr.responseText);
-                    resolve();  // 解决Promise表示成功完成
-                } else {
-                    reject('Upload failed with status: ' + xhr.status);  // 拒绝Promise表示出错
+                    var response = JSON.parse(xhr.responseText);
+                    console.log(response);
+                    console.log(typeof(response["questions"]));
+                    s1.innerHTML = response["questions"][0];
+                    s2.innerHTML = response["questions"][1];
+                    s1.addEventListener('click', () => {
+                        input.value = s1.innerHTML;
+                        query(url);
+                    });
+                    s2.addEventListener('click', () => {
+                        input.value = s2.innerHTML;
+                        query(url);
+                    });
                 }
             }
         }
-        xhr.send(formData);
-    });
-}
+        xhr.send();
+        console.log("suggestion", url);
+    }
 
-async function executeScripts() {
-    try {
-        const tabs = await chrome.tabs.query({active: true, currentWindow: true});
-        const url = tabs[0].url;
-        await chrome.scripting.executeScript({
+    function upload_html(url) {
+        return new Promise((resolve, reject) => {
+            var htmlContent = document.documentElement.outerHTML;
+            var formData = new FormData();
+            const host = 'http://localhost:8080';
+            formData.append('html', htmlContent);
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', host + '/upload?url=' + url, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        console.log(xhr.responseText);
+                        resolve();  // 解决Promise表示成功完成
+                    } else {
+                        reject('Upload failed with status: ' + xhr.status);  // 拒绝Promise表示出错
+                    }
+                }
+            }
+            xhr.send(formData);
+        });
+    }
+
+    chrome.tabs.query({active: true, currentWindow: true}).then((tabs) => {
+        var url = tabs[0].url;
+        chrome.scripting.executeScript({
             target : {tabId : tabs[0].id},
             func : upload_html,
-            args : [url]
-        });
-        get_suggestion(url); // 在upload_html执行完成后调用
-    } catch (error) {
-        console.error('An error occurred:', error);
-    }
-}
-
-executeScripts();  // 调用异步函数执行脚本
+            args : [url],
+        })
+    }).then(() => {
+        chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+            var url = tabs[0].url;
+            get_suggestion(url);
+        }
+    )});
 
     // chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
     //     var url = tabs[0].url;
@@ -159,7 +157,6 @@ executeScripts();  // 调用异步函数执行脚本
 
     function query(url) {
         var xhr = new XMLHttpRequest();
-        // xhr.withCredentials = true;
         xhr.open('GET', host+'/assistant_qa?question=' + input.value + "&url=" + url, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
@@ -206,6 +203,7 @@ executeScripts();  // 调用异步函数执行脚本
             }
         }
         xhr.send();
+        console.log("query");
     }
 
     // input enter
