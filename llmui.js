@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const s1 = document.getElementById('s1');
     const s2 = document.getElementById('s2');
     const kwtext = document.getElementById('kw');
-    const host = 'http://localhost:8000';
+    const host = 'http://localhost:8080';
     
     kwtext.innerHTML = '';
     var highlight = '';
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
                     console.log(xhr.responseText);
-                    resolve();  // 解决Promise表示成功完成
+                    // resolve();  // 解决Promise表示成功完成
                 } else {
                     reject('Upload failed with status: ' + xhr.status);  // 拒绝Promise表示出错
                 }
