@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const s1 = document.getElementById('s1');
     const s2 = document.getElementById('s2');
     const kwtext = document.getElementById('kw');
-    const host = 'http://localhost:8000';
-    // const host = 'http://localhost:8000';
+    const host = 'http://localhost:8080';
+    // const host = 'http://localhost:8080';
     const ask_button = document.getElementById('ask_button');
     const input_question = document.getElementById('input_question');
     
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function upload_html(url) {
         var htmlContent = document.documentElement.outerHTML;
         var formData = new FormData();
-        const host = 'http://localhost:8000';
+        const host = 'http://localhost:8080';
         formData.append('html', htmlContent);
         var xhr = new XMLHttpRequest();
         xhr.open('POST', host + '/upload?url=' + url, true);
@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     for (var i = 0; i < response['basis'].length; i++)
                     {
                         var kw = response['basis'][i];
-                        kwtext.innerHTML += "<li class='text' id='li_" + i + "' style='margin: 1em;'><a href='javascript:void(0);'>" + kw + "</a></li>";
+                        kwtext.innerHTML += "<li class='text' id='li_" + i + "' style='margin: 1em;'><a>" + kw + "</a></li>";
                         var li = document.getElementById('li_' + i);
                         li.addEventListener('click', () => {
                             // remove highlight
