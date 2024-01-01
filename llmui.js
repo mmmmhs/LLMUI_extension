@@ -30,11 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     s2.innerHTML = response["questions"][1];
                     s1.addEventListener('click', () => {
                         input.value = s1.innerHTML;
-                        query(url);
                     });
                     s2.addEventListener('click', () => {
                         input.value = s2.innerHTML;
-                        query(url);
                     });
                 }
             }
@@ -188,8 +186,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function query(url) {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', host+'/assistant_qa?question=' + input.value + "&url=" + url, true);
+        var loadingIndicator = document.getElementById('loadingIndicator');
+        loadingIndicator.style.display = 'block';
+
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
+                loadingIndicator.style.display = 'none';
                 if (xhr.status == 200) {
                     var response = JSON.parse(xhr.responseText);
                     answer_title.innerHTML = "Answer: "
