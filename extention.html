@@ -2,9 +2,9 @@
 <html>
 
 <head>
-  <title>LLMUI</title>
-  <script src="llmui.js" type="module"></script>
-  <link rel="stylesheet" href="bootstrap-5.3.2-dist/css/bootstrap.min.css">
+    <title>LLMUI</title>
+    <script src="llmui.js" type="module"></script>
+    <link rel="stylesheet" href="bootstrap-5.3.2-dist/css/bootstrap.min.css">
 </head>
 
 <body style="
@@ -13,35 +13,33 @@ background-color: rgba(246, 251, 252);
 width: 300px;
 " class="p-3 row g-2">
 
-  <form class="row g-2" id="form">
-    <input type="text" id="input" class="form-control" placeholder="Enter your question here...">
-    <div class="col-12">
-      <button type="submit" class="btn btn-sm btn-primary">Ask</button>
+    <form class="row g-2" id="form">
+        <input type="text" id="input" class="form-control" placeholder="Enter your question here...">
+    </form>
+
+    <!-- align center -->
+    <div class="d-flex justify-content-center">  
+        <button type="submit" class="btn btn-sm btn-primary">Ask</button>
     </div>
-  </form>
 
-  <div class="row g-2" id="suggestion">
-    <h5>You might want to ask</h5>
-    <div class="card shadow-sm p-2" role="button">
-      <suggestion id="s1">Loading...</suggestion> <br>
+    <div class="row g-2" id="suggestion">
+        <h5>You might want to ask</h5>
+        <div class="card shadow-sm p-2" role="button">
+            <suggestion id="s1">Loading...</suggestion> 
+        </div>
+        <div class="card shadow-sm p-2" role="button">
+            <suggestion id="s2">Loading...</suggestion>
+        </div>
     </div>
-    <div class="card shadow-sm p-2" role="button">
-      <suggestion id="s2">Loading...</suggestion>
-    </div>
-  </div>
 
-  <ul id="kw">
-    <li class="text" id="li_" +><a href="javascript:void(0);"></a></li>
-  </ul>
+    <ul id="kw">
+        <li class="text" id="li_" +><a href="javascript:void(0);"></a></li>
+    </ul>
 
-  <!-- What's this? -->
-  <!-- <button type="button" id="query">query</button>
-        <button type="button" id="find">find</button> -->
-  <div id="answer"></div>
-  <span class="label" id="output"></span>
+    <div id="answer"></div>
+    <span class="label" id="output"></span>
 
-
-  <script src="bootstrap-5.3.2-dist/js/bootstrap.min.js"></script>
+    <script src="bootstrap-5.3.2-dist/js/bootstrap.min.js"></script>
 </body>
 
 </html>

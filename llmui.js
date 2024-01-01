@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log(xhr.responseText);
                     var response = JSON.parse(xhr.responseText);
                     console.log(response);
-                    console.log(typeof(response["questions"]));
+                    // console.log(typeof(response["questions"]));
                     s1.innerHTML = response["questions"][0];
                     s2.innerHTML = response["questions"][1];
                     s1.addEventListener('click', () => {
@@ -42,25 +42,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function upload_html(url) {
-        return new Promise((resolve, reject) => {
-            var htmlContent = document.documentElement.outerHTML;
-            var formData = new FormData();
-            const host = 'http://localhost:8080';
-            formData.append('html', htmlContent);
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', host + '/upload?url=' + url, true);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == 4) {
-                    if (xhr.status == 200) {
-                        console.log(xhr.responseText);
-                        resolve();  // 解决Promise表示成功完成
-                    } else {
-                        reject('Upload failed with status: ' + xhr.status);  // 拒绝Promise表示出错
-                    }
+        // return new Promise((resolve, reject) => {
+        var htmlContent = document.documentElement.outerHTML;
+        var formData = new FormData();
+        const host = 'http://localhost:8080';
+        formData.append('html', htmlContent);
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', host + '/upload?url=' + url, true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                if (xhr.status == 200) {
+                    console.log(xhr.responseText);
+                    resolve();  // 解决Promise表示成功完成
+                } else {
+                    reject('Upload failed with status: ' + xhr.status);  // 拒绝Promise表示出错
                 }
             }
-            xhr.send(formData);
-        });
+        }
+        xhr.send(formData);
+        // });
     }
 
     chrome.tabs.query({active: true, currentWindow: true}).then((tabs) => {
