@@ -52,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
                     console.log(xhr.responseText);
-                    // resolve();  // 解决Promise表示成功完成
                 } else {
                     reject('Upload failed with status: ' + xhr.status);  // 拒绝Promise表示出错
                 }
@@ -152,6 +151,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function highlight(searchTexts) {
+        const allElements = document.querySelectorAll("body *");
+    
+        // Function to check and highlight an element based on searchText
+        const highlightIfMatch = (element, searchText) => {
+            const textContent = element.innerText || "";
+            const title = element.getAttribute("title") || "";
+    
+            if (textContent === searchText || title.includes(searchText)) {
+            element.style.backgroundColor = "yellow";
+            }
+        };
+    
+        // Iterate over each element in the document
+        allElements.forEach((element) => {
+            // Check each search text for a match
+            searchTexts.forEach((searchText) => {
+            highlightIfMatch(element, searchText);
+            });
+        });
+    }
+    
+    function resetHighlight() {
+        const allElements = document.querySelectorAll("body *");
+    
+        allElements.forEach((element) => {
+            // Remove the inline background color style
+            element.style.backgroundColor = "";
+        });
+    }
+    
 
     function query(url) {
         var xhr = new XMLHttpRequest();
@@ -175,25 +205,25 @@ document.addEventListener('DOMContentLoaded', () => {
                                 chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
                                     chrome.scripting.executeScript({
                                         target : {tabId : tabs[0].id},
-                                        func : remove_highlight,
-                                        args : [highlight]
+                                        func : resetHighlight,
+                                        // args : [highlight]
                                     });
                                 });
                             }
                             chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
                                 chrome.scripting.executeScript({
                                     target : {tabId : tabs[0].id},
-                                    func : find_in_title,
+                                    func : highlight,
                                     args : [kw]
                                 });
                             });
-                            chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-                                chrome.scripting.executeScript({
-                                    target : {tabId : tabs[0].id},
-                                    func : find_in_text_node,
-                                    args : [kw]
-                                });
-                            });
+                            // chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+                            //     chrome.scripting.executeScript({
+                            //         target : {tabId : tabs[0].id},
+                            //         func : find_in_text_node,
+                            //         args : [kw]
+                            //     });
+                            // });
                             highlight = kw;
                         });
                     }
@@ -209,6 +239,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event.key == 'Enter') {
             chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
                 var url = tabs[0].url;
+                chrome.scripting.executeScript({
+                    target : {tabId : tabs[0].id},
+                    func : resetHighlight,
+                });
                 query(url);
             });
         }
