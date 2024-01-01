@@ -79,10 +79,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
 
                     s1_button.addEventListener('click', () => {
-                        input.value = s1.innerHTML;
+                        if (s1.innerHTML != 'Loading...') input.value = s1.innerHTML;
                     });
                     s2_button.addEventListener('click', () => {
-                        input.value = s2.innerHTML;
+                        if (s2.innerHTML != 'Loading...') input.value = s2.innerHTML;
                     });
                 }
             }
