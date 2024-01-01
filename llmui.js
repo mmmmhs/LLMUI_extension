@@ -369,6 +369,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     chrome.storage.local.set({'keywords': response['basis']}, function() {
                         console.log('keywords in localstorage is set to ' + response['basis']);
                     });
+
+                    // store input_question in local storage
+                    chrome.storage.local.set({'input_question': input_question.innerHTML}, function() {
+                        console.log('input_question in localstorage  is set to ' + input_question.innerHTML);
+                    });
+
                     for (var i = 0; i < 3; i++)
                     {
                         var kw = response['basis'][i];
@@ -406,11 +412,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 query(url);
                 // query_mock(url);
                 input_question.innerHTML = input.value;
-                // store input_question in local storage
-                chrome.storage.local.set({'input_question': input.value}, function() {
-                    console.log('input_question in localstorage  is set to ' + input.value);
-                    input.value = '';
-                });
+                input.value = '';
+                // // store input_question in local storage
+                // chrome.storage.local.set({'input_question': input.value}, function() {
+                //     console.log('input_question in localstorage  is set to ' + input.value);
+                //     input.value = '';
+                // });
 
             });
         }
@@ -428,11 +435,12 @@ document.addEventListener('DOMContentLoaded', () => {
             query(url);
             // query_mock(url);
             input_question.innerHTML = input.value;
-            // store input_question in local storage
-            chrome.storage.local.set({'input_question': input.value}, function() {
-                console.log('input_question in localstorage is set to ' + input.value);
-                input.value = '';
-            });
+            input.value = '';
+            // // store input_question in local storage
+            // chrome.storage.local.set({'input_question': input.value}, function() {
+            //     console.log('input_question in localstorage is set to ' + input.value);
+            //     input.value = '';
+            // });
         });
     });
 
