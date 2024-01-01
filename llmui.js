@@ -11,38 +11,37 @@ document.addEventListener('DOMContentLoaded', () => {
     
     kwtext.innerHTML = '';
     var highlight = '';
-
-    // send request to local server
-    function get_suggestion(url) {
-        var xhr = new XMLHttpRequest();
-        // xhr.withCredentials = true;
-        xhr.open('GET', host+'/assistant_suggestion?url=' + url, true);
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
-                    // set text of s1 and s2
-                    console.log(xhr.responseText)
-                    var response = JSON.parse(xhr.responseText);
-                    console.log(response)
-                    console.log(typeof(response["questions"]))
-                    s1.innerHTML = response["questions"][0];
-                    s2.innerHTML = response["questions"][1];
-                    s1.addEventListener('click', () => {
-                        input.value = s1.innerHTML;
-                        query(url);
-                    });
-                    s2.addEventListener('click', () => {
-                        input.value = s2.innerHTML;
-                        query(url);
-                    });
-                }
+// send request to local server
+function get_suggestion(url) {
+    var xhr = new XMLHttpRequest();
+    // xhr.withCredentials = true;
+    xhr.open('GET', host+'/assistant_suggestion?url=' + url, true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4) {
+            if (xhr.status == 200) {
+                // set text of s1 and s2
+                console.log(xhr.responseText);
+                var response = JSON.parse(xhr.responseText);
+                console.log(response);
+                console.log(typeof(response["questions"]));
+                s1.innerHTML = response["questions"][0];
+                s2.innerHTML = response["questions"][1];
+                s1.addEventListener('click', () => {
+                    input.value = s1.innerHTML;
+                    query(url);
+                });
+                s2.addEventListener('click', () => {
+                    input.value = s2.innerHTML;
+                    query(url);
+                });
             }
         }
-        xhr.send();
     }
+    xhr.send();
+}
 
-    function upload_html(url) {
-        // 获取当前页面的 HTML
+function upload_html(url) {
+    return new Promise((resolve, reject) => {
         var htmlContent = document.documentElement.outerHTML;
         var formData = new FormData();
         const host = 'http://localhost:8000';
@@ -53,20 +52,32 @@ document.addEventListener('DOMContentLoaded', () => {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
                     console.log(xhr.responseText);
+                    resolve();  // 解决Promise表示成功完成
+                } else {
+                    reject('Upload failed with status: ' + xhr.status);  // 拒绝Promise表示出错
                 }
             }
         }
         xhr.send(formData);
-    }
+    });
+}
 
-    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-        var url = tabs[0].url;
-        chrome.scripting.executeScript({
+async function executeScripts() {
+    try {
+        const tabs = await chrome.tabs.query({active: true, currentWindow: true});
+        const url = tabs[0].url;
+        await chrome.scripting.executeScript({
             target : {tabId : tabs[0].id},
             func : upload_html,
             args : [url]
-        }).then(() => {get_suggestion(url);});
-    });
+        });
+        get_suggestion(url); // 在upload_html执行完成后调用
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+}
+
+executeScripts();  // 调用异步函数执行脚本
 
     // chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
     //     var url = tabs[0].url;
