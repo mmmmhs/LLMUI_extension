@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const s1 = document.getElementById('s1');
     const s2 = document.getElementById('s2');
     const kwtext = document.getElementById('kw');
-    const host = 'http://localhost:8000';
+    const host = 'http://localhost:8080';
+    // const host = 'http://localhost:8080';
     const ask_button = document.getElementById('ask_button');
     const input_question = document.getElementById('input_question');
     
@@ -90,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function upload_html(url) {
         var htmlContent = document.documentElement.outerHTML;
         var formData = new FormData();
-        const host = 'http://localhost:8000';
+        const host = 'http://localhost:8080';
         formData.append('html', htmlContent);
         var xhr = new XMLHttpRequest();
         xhr.open('POST', host + '/upload?url=' + url, true);
@@ -98,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
                     console.log(xhr.responseText);
-                    // resolve();  // 解决Promise表示成功完成
                 } else {
                     reject('Upload failed with status: ' + xhr.status);  // 拒绝Promise表示出错
                 }
@@ -219,6 +219,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function highlight(searchTexts) {
+        const allElements = document.querySelectorAll("body *");
+    
+        // Function to check and highlight an element based on searchText
+        const highlightIfMatch = (element, searchText) => {
+            const textContent = element.innerText || "";
+            const title = element.getAttribute("title") || "";
+    
+            if (textContent === searchText || title.includes(searchText)) {
+            element.style.backgroundColor = "yellow";
+            }
+        };
+    
+        // Iterate over each element in the document
+        allElements.forEach((element) => {
+            // Check each search text for a match
+            searchTexts.forEach((searchText) => {
+            highlightIfMatch(element, searchText);
+            });
+        });
+    }
+    
+    function resetHighlight() {
+        const allElements = document.querySelectorAll("body *");
+    
+        allElements.forEach((element) => {
+            // Remove the inline background color style
+            element.style.backgroundColor = "";
+        });
+    }
+    
 
     function query(url) {
         var xhr = new XMLHttpRequest();
@@ -242,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     for (var i = 0; i < response['basis'].length; i++)
                     {
                         var kw = response['basis'][i];
-                        kwtext.innerHTML += "<li class='text' id='li_" + i + "'><a href='javascript:void(0);'>" + kw + "</a></li>";
+                        kwtext.innerHTML += "<li class='text' id='li_" + i + "' style='margin: 1em;'><a>" + kw + "</a></li>";
                         var li = document.getElementById('li_' + i);
                         li.addEventListener('click', () => {
                             // remove highlight
@@ -259,14 +290,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
                                 chrome.scripting.executeScript({
                                     target : {tabId : tabs[0].id},
-                                    func : find_in_title,
+                                    func : find_in_text_node,
                                     args : [kw]
                                 });
                             });
                             chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
                                 chrome.scripting.executeScript({
                                     target : {tabId : tabs[0].id},
-                                    func : find_in_text_node,
+                                    func : find_in_title,
                                     args : [kw]
                                 });
                             });
@@ -286,6 +317,11 @@ document.addEventListener('DOMContentLoaded', () => {
             chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
                 output.innerHTML = ''; // clear output
                 var url = tabs[0].url;
+                chrome.scripting.executeScript({
+                    target : {tabId : tabs[0].id},
+                    func : resetHighlight,
+                });
+                console.log(`query with url ${url} and input value ${input.value}`)
                 query(url);
                 input_question.innerHTML = input.value;
                 // store input_question in local storage
@@ -303,6 +339,10 @@ document.addEventListener('DOMContentLoaded', () => {
         chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
             output.innerHTML = ''; // clear output
             var url = tabs[0].url;
+            chrome.scripting.executeScript({
+                target : {tabId : tabs[0].id},
+                func : resetHighlight,
+            });
             query(url);
             input_question.innerHTML = input.value;
             // store input_question in local storage
