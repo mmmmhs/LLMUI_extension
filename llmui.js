@@ -256,6 +256,10 @@ document.addEventListener('DOMContentLoaded', () => {
     ask_button.addEventListener('click', () => {
         chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
             var url = tabs[0].url;
+            chrome.scripting.executeScript({
+                target : {tabId : tabs[0].id},
+                func : resetHighlight,
+            });
             query(url);
             input.value = '';
         });
