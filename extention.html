@@ -22,10 +22,6 @@ width: 300px;
         <button type="button" class="btn btn-sm btn-primary" id="ask_button">Ask</button>
     </div>
 
-    <div id="loadingIndicator" style="display:none;">
-        <i class="fa fa-spinner fa-spin"></i>
-    </div>
-
     <div class="row g-2" id="suggestion">
         <h5>You might want to ask</h5>
         <div class="card shadow-sm p-2" role="button">
@@ -39,6 +35,12 @@ width: 300px;
     <ul id="kw">
         <li class="text" id="li_" +><a href="javascript:void(0);"></a></li>
     </ul>
+
+    <div class="position-relative">
+      <div id="loadingIndicator" class="position-absolute top-50 start-50" style="display:none;">
+        <i class="fa fa-spinner fa-spin"></i>
+      </div>
+    </div>
 
     <div id="answer"></div>
     <span class="label" id="output"></span>
