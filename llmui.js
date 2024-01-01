@@ -13,6 +13,27 @@ document.addEventListener('DOMContentLoaded', () => {
     kwtext.innerHTML = '';
     var highlight = '';
     
+    // check if suggestion is stored in local storage
+    chrome.storage.local.get(['s1'], function(result){
+        if (result.s1 != undefined && result.s1 != 'Loading...') {
+            console.log('suggested question one in local storage currently is ' + result.s1);
+            s1.innerHTML = result.s1;
+            s1.addEventListener('click', () => {
+                input.value = s1.innerHTML;
+            });
+        }
+    });
+
+    chrome.storage.local.get(['s2'], function(result){
+        if (result.s2 != undefined && result.s2 != 'Loading...') {
+            console.log('suggested question one in local storage currently is ' + result.s2);
+            s2.innerHTML = result.s2;
+            s2.addEventListener('click', () => {
+                input.value = s2.innerHTML;
+            });
+        }
+    });
+
     // check if input_question is stored in local storage
     chrome.storage.local.get(['input_question'], function(result) {
         if (result.input_question != undefined) {
@@ -44,6 +65,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     // console.log(typeof(response["questions"]));
                     s1.innerHTML = response["questions"][0];
                     s2.innerHTML = response["questions"][1];
+
+                    // set output in local storage
+                    chrome.storage.local.set({'s1': response['questions'][0]}, function() {
+                        console.log('suggested question one in localstorage is set to ' + response['questions'][0]);
+                    });
+                    chrome.storage.local.set({'s2': response['questions'][1]}, function() {
+                        console.log('suggested question two in localstorage is set to ' + response['questions'][1]);
+                    });
+
                     s1.addEventListener('click', () => {
                         input.value = s1.innerHTML;
                     });
@@ -79,6 +109,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     chrome.tabs.query({active: true, currentWindow: true}).then((tabs) => {
         var url = tabs[0].url;
+
+            // 获取之前保存的 URL
+        chrome.storage.local.get(['savedUrl'], function(result) {
+            if (result.savedUrl !== url) {
+                // 如果 URL 不同，清空 'input_question' 和 'output'
+                chrome.storage.local.set({ 'input_question': '', 'output': '', 's1':'Loading...', 's2':'Loading'});
+                s1.innerHTML = 'Loading...';
+                s2.innerHTML = 'Loading...';
+                input_question.innerHTML = '';
+                output.innerHTML = '';
+
+                // 可选：更新保存的 URL
+                chrome.storage.local.set({ 'savedUrl': url });
+            }
+        });
+        chrome.storage.local.get(['output'], function(result) {
+            if (result.output == undefined || result.output == ''){
+                chrome.storage.local.set({'input_question': ''});
+                input_question.innerHTML = '';
+            }
+        });
         chrome.scripting.executeScript({
             target : {tabId : tabs[0].id},
             func : upload_html,
