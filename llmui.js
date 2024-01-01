@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     for (var i = 0; i < response['basis'].length; i++)
                     {
                         var kw = response['basis'][i];
-                        kwtext.innerHTML += "<li class='text' id='li_" + i + "'><a href='javascript:void(0);'>" + kw + "</a></li>";
+                        kwtext.innerHTML += "<li class='text' id='li_" + i + "' style='margin: 1em;'><a href='javascript:void(0);'>" + kw + "</a></li>";
                         var li = document.getElementById('li_' + i);
                         li.addEventListener('click', () => {
                             // remove highlight
@@ -209,25 +209,25 @@ document.addEventListener('DOMContentLoaded', () => {
                                 chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
                                     chrome.scripting.executeScript({
                                         target : {tabId : tabs[0].id},
-                                        func : resetHighlight,
-                                        // args : [highlight]
+                                        func : remove_highlight,
+                                        args : [highlight]
                                     });
                                 });
                             }
                             chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
                                 chrome.scripting.executeScript({
                                     target : {tabId : tabs[0].id},
-                                    func : highlight,
+                                    func : find_in_text_node,
                                     args : [kw]
                                 });
                             });
-                            // chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-                            //     chrome.scripting.executeScript({
-                            //         target : {tabId : tabs[0].id},
-                            //         func : find_in_text_node,
-                            //         args : [kw]
-                            //     });
-                            // });
+                            chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+                                chrome.scripting.executeScript({
+                                    target : {tabId : tabs[0].id},
+                                    func : find_in_title,
+                                    args : [kw]
+                                });
+                            });
                             highlight = kw;
                         });
                     }
