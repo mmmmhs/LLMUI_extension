@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // const querybtn = document.getElementById('query');
     // const findbtn = document.getElementById('find');
     const input = document.getElementById('input');
-    const answer_title = document.getElementById('answer');
     const output = document.getElementById('output'); 
     const s1 = document.getElementById('s1');
     const s2 = document.getElementById('s2');
@@ -10,9 +9,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const host = 'http://localhost:8080';
     // const host = 'http://localhost:8000';
     const ask_button = document.getElementById('ask_button');
+    const input_question = document.getElementById('input_question');
     
     kwtext.innerHTML = '';
     var highlight = '';
+    
+    // check if input_question is stored in local storage
+    chrome.storage.local.get(['input_question'], function(result) {
+        if (result.input_question != undefined) {
+            console.log('input_question in local storage currently is ' + result.input_question);
+            input_question.innerHTML = result.input_question;
+        }
+    });
+
+    // check if output is stored in local storage
+    chrome.storage.local.get(['output'], function(result) {
+        if (result.output != undefined) {
+            console.log('output in local storage currently is ' + result.output);
+            output.innerHTML = result.output;
+        }
+    });
+    
     // send request to local server
     function get_suggestion(url) {
         var xhr = new XMLHttpRequest();
@@ -194,8 +211,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadingIndicator.style.display = 'none';
                 if (xhr.status == 200) {
                     var response = JSON.parse(xhr.responseText);
-                    answer_title.innerHTML = "Answer: "
                     output.innerHTML = response['answer'];
+
+                    // set output in local storage
+                    chrome.storage.local.set({'output': response['answer']}, function() {
+                        console.log('output in localstorage is set to ' + response['answer']);
+                    });
+
                     kwtext.innerHTML = ""
                     for (var i = 0; i < response['basis'].length; i++)
                     {
@@ -242,6 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
     input.addEventListener('keyup', (event) => {
         if (event.key == 'Enter') {
             chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+                output.innerHTML = ''; // clear output
                 var url = tabs[0].url;
                 chrome.scripting.executeScript({
                     target : {tabId : tabs[0].id},
@@ -249,7 +272,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 console.log(`query with url ${url} and input value ${input.value}`)
                 query(url);
-                input.value = '';
+                input_question.innerHTML = input.value;
+                // store input_question in local storage
+                chrome.storage.local.set({'input_question': input.value}, function() {
+                    console.log('input_question in localstorage  is set to ' + input.value);
+                    input.value = '';
+                });
+
             });
         }
     });
@@ -257,13 +286,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // when ask_button is clicked
     ask_button.addEventListener('click', () => {
         chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+            output.innerHTML = ''; // clear output
             var url = tabs[0].url;
             chrome.scripting.executeScript({
                 target : {tabId : tabs[0].id},
                 func : resetHighlight,
             });
             query(url);
-            input.value = '';
+            input_question.innerHTML = input.value;
+            // store input_question in local storage
+            chrome.storage.local.set({'input_question': input.value}, function() {
+                console.log('input_question in localstorage is set to ' + input.value);
+                input.value = '';
+            });
         });
     });
 });
