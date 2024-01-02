@@ -6,5 +6,5 @@ The backend server is deployed by https://github.com/chuanmx20/web-crawl-qa.
 
 1. Clone this repository.
 2. Load this directory in Chrome as an [unpacked extension](https://developer.chrome.com/docs/extensions/mv3/getstarted/development-basics/#load-unpacked).
-3. Pin the extension to the taskbar and click the action button.
+3. Pin the extension to the taskbar.
 4. Click the extension's action button to visit the popup page.
