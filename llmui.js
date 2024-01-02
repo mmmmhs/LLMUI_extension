@@ -227,18 +227,25 @@ document.addEventListener('DOMContentLoaded', () => {
             node_value = node.childNodes[0].nodeValue;
             outer_html = node.outerHTML
             var re = new RegExp('^<a[^>]*title="[^>]*' + value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '[^>]*"[^>]*>.*?</a>$', 'g');
-            try {
-                if (outer_html.match(re)) {
-                    // re_2 = new RegExp('(<[^>]*>)'+ node_value +'(</[^>]*>)', 'g')
-                    // new_value = node_value.replace(re, "<mark class='hlmask_"+ value.replace(/ /g, "_") + "'>" + value +"</mark>")
-                    // new_html = node_html.replace(node_value, new_value)
-                    // node.innerHTML = new_html;
-                    console.log(node)
+            if (outer_html.match(re)) {
+                // re_2 = new RegExp('(<[^>]*>)'+ node_value +'(</[^>]*>)', 'g')
+                // new_value = node_value.replace(re, "<mark class='hlmask_"+ value.replace(/ /g, "_") + "'>" + value +"</mark>")
+                // new_html = node_html.replace(node_value, new_value)
+                // node.innerHTML = new_html;
+                console.log(node)
+                try {
                     node.childNodes[0].style.backgroundColor = "yellow";
+                } catch (e) {
+                    console.log(e);
+                    console.log(node_value);
+                    try {
+                        node.style.backgroundColor = "yellow";
+                    }
+                    catch (e) {
+                        console.log(e);
+                        console.log(node_value);
+                    }
                 }
-            } catch (e) {
-                console.log(e);
-                console.log(node_value)
             }
         }
     }
