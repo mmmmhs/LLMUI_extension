@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const s1_button = document.getElementById('s1_button');
     const s2_button = document.getElementById('s2_button');
     const kwtext = document.getElementById('kw');
-    const host = 'http://localhost:8080';
-    // const host = 'http://localhost:8080';
+    const host = 'http://localhost:8000';
+    // const host = 'http://localhost:8000';
     const ask_button = document.getElementById('ask_button');
     const input_question = document.getElementById('input_question');
     const highlight_title = document.getElementById('highlight_title');
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function upload_html(url) {
         var htmlContent = document.documentElement.outerHTML;
         var formData = new FormData();
-        const host = 'http://localhost:8080';
+        const host = 'http://localhost:8000';
         formData.append('html', htmlContent);
         var xhr = new XMLHttpRequest();
         xhr.open('POST', host + '/upload?url=' + url, true);
