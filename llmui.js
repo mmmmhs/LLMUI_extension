@@ -438,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     chrome.storage.local.get(['keywords'], function(result) {
-        if (result.keywords != undefined) {
+        if (result.keywords != undefined && result.keywords != '') {
             console.log('keywords in local storage currently is ' + result.keywords);
 
             highlight_title.className = 'visible';
