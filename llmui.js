@@ -193,6 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // new_html = node_html.replace(node_value, new_value)
                     // node.innerHTML = new_html;
                     node.style.backgroundColor = "yellow";
+                    node.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
                 }
             } catch (e) {
                 console.log(e);
@@ -234,11 +235,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log(node)
                 try {
                     node.childNodes[0].style.backgroundColor = "yellow";
+                    node.childNodes[0].scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
                 } catch (e) {
                     console.log(e);
                     console.log(node.childNodes[0]);
                     try {
                         node.style.backgroundColor = "yellow";
+                        node.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
                     }
                     catch (e) {
                         console.log(e);
