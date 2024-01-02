@@ -352,6 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
         var loadingIndicator = document.getElementById('loadingIndicator');
         loadingIndicator.style.display = 'block';
         kwtext.innerHTML = ""
+        highlight_title.className = 'invisible';
 
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
@@ -391,6 +392,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('li_2').addEventListener('click', () => {
                         kw_click(li[2].innerHTML)
                     });
+
+                    highlight_title.className = 'visible';
                 }
             }
         }
