@@ -112,8 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     chrome.tabs.query({active: true, currentWindow: true}).then((tabs) => {
         var url = tabs[0].url;
-
-            // 获取之前保存的 URL
+        // 获取之前保存的 URL
         chrome.storage.local.get(['savedUrl'], function(result) {
             if (result.savedUrl !== url) {
                 // 如果 URL 不同，清空 'input_question' 和 'output' 和 'keywords'
@@ -237,13 +236,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     node.childNodes[0].style.backgroundColor = "yellow";
                 } catch (e) {
                     console.log(e);
-                    console.log(node_value);
+                    console.log(node.childNodes[0]);
                     try {
                         node.style.backgroundColor = "yellow";
                     }
                     catch (e) {
                         console.log(e);
-                        console.log(node_value);
+                        console.log(node);
                     }
                 }
             }
@@ -423,6 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // query_mock(url);
                 input_question.innerHTML = input.value;
                 input.value = '';
+                get_suggestion(url);
                 // // store input_question in local storage
                 // chrome.storage.local.set({'input_question': input.value}, function() {
                 //     console.log('input_question in localstorage  is set to ' + input.value);
@@ -446,6 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // query_mock(url);
             input_question.innerHTML = input.value;
             input.value = '';
+            get_suggestion(url);
             // // store input_question in local storage
             // chrome.storage.local.set({'input_question': input.value}, function() {
             //     console.log('input_question in localstorage is set to ' + input.value);
