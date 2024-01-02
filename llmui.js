@@ -146,11 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     )});
 
-    // chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-    //     var url = tabs[0].url;
-    //     get_suggestion(url);
-    // });
-
     function find(value) {
         var res = window.find(value, false, false, true);
         console.log(res);
@@ -401,7 +396,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('li_2').addEventListener('click', () => {
                         kw_click(li[2].innerHTML)
                     });
-
                     highlight_title.className = 'visible';
                 }
             }
@@ -410,34 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(`query with url ${url} and input value ${input.value}`)
     }
 
-    // input enter
-    input.addEventListener('keyup', (event) => {
-        if (event.key == 'Enter') {
-            chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-                output.innerHTML = ''; // clear output
-                var url = tabs[0].url;
-                chrome.scripting.executeScript({
-                    target : {tabId : tabs[0].id},
-                    func : reset_highlight,
-                });
-                console.log(`query with url ${url} and input value ${input.value}`)
-                query(url);
-                // query_mock(url);
-                input_question.innerHTML = input.value;
-                input.value = '';
-                get_suggestion(url);
-                // // store input_question in local storage
-                // chrome.storage.local.set({'input_question': input.value}, function() {
-                //     console.log('input_question in localstorage  is set to ' + input.value);
-                //     input.value = '';
-                // });
-
-            });
-        }
-    });
-
-    // when ask_button is clicked
-    ask_button.addEventListener('click', () => {
+    function send_query() {
         chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
             output.innerHTML = ''; // clear output
             var url = tabs[0].url;
@@ -445,6 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 target : {tabId : tabs[0].id},
                 func : reset_highlight,
             });
+            console.log(`query with url ${url} and input value ${input.value}`)
             query(url);
             // query_mock(url);
             input_question.innerHTML = input.value;
@@ -452,10 +420,21 @@ document.addEventListener('DOMContentLoaded', () => {
             get_suggestion(url);
             // // store input_question in local storage
             // chrome.storage.local.set({'input_question': input.value}, function() {
-            //     console.log('input_question in localstorage is set to ' + input.value);
+            //     console.log('input_question in localstorage  is set to ' + input.value);
             //     input.value = '';
             // });
         });
+    }
+
+    // input enter
+    input.addEventListener('keyup', (event) => {
+        if (event.key == 'Enter') {
+            send_query();
+        }
+    });
+    // when ask_button is clicked
+    ask_button.addEventListener('click', () => {
+        send_query();
     });
 
     chrome.storage.local.get(['keywords'], function(result) {
